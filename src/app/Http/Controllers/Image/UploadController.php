@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Image;
 
 use App\Helpers\ApiResponse;
+use App\Helpers\AspectRatio;
+use App\Helpers\MemoryConvert;
 use App\Http\Controllers\Controller;
 use App\Models\Media;
 use App\Models\UploadMediaRule;
@@ -39,11 +41,11 @@ class UploadController extends Controller
             return ApiResponse::validationFailure('Current provider does not support such media type', []);
         }
 
-        if (!$getMediaRules->aspect_ratio && $this->getAspectRatio($imageWidth, $imageHeight) !== $getMediaRules->aspect_ratio) {
+        if (!$getMediaRules->aspect_ratio && AspectRatio::getAspectRatio($imageWidth, $imageHeight) !== $getMediaRules->aspect_ratio) {
             return ApiResponse::validationFailure('The image aspect ration should be '.$getMediaRules->aspect_ratio, []);
         }
         
-        if ($this->convertBytesToMb($fileSize) > $getMediaRules->max_media_size_mb) {
+        if (MemoryConvert::convertBytesToMb($fileSize) > $getMediaRules->max_media_size_mb) {
             return ApiResponse::validationFailure('The image size should be less than '.$getMediaRules->max_media_size_mb.' MB', []);
         }
 
@@ -65,28 +67,5 @@ class UploadController extends Controller
                 "mime" => $file->getClientMimeType()
             ]
         ]);
-    }
-
-    public function getAspectRatio(int $width, int $height)
-    {
-        $greatestCommonDivisor = static function ($width, $height) use (&$greatestCommonDivisor) {
-            return ($width % $height) ? $greatestCommonDivisor($height, $width % $height) : $height;
-        };
-
-        $divisor = $greatestCommonDivisor($width, $height);
-
-        return $width / $divisor . ':' . $height / $divisor;
-    }
-
-    /**
-     * Format bytes to kb, mb, gb, tb
-     *
-     * @param  integer $size
-     * @param  integer $precision
-     * @return integer
-     */
-    public static function convertBytesToMb($fileSize)
-    {
-        return round($fileSize / 1024 / 1024, 4);
     }
 }
