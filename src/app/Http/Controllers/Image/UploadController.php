@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Helpers\AspectRatio;
 use App\Helpers\MemoryConvert;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ImageUploadRequest;
 use App\Models\Media;
 use App\Models\UploadMediaRule;
 use Illuminate\Http\Request;
@@ -18,14 +19,8 @@ class UploadController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ImageUploadRequest $request)
     {
-        $request->validate([
-            'name' => 'string|max:50',
-            'provider' => 'required|exists:providers,id',
-            'image_file' => 'required|image|mimes:jpeg,jpg,gif|max:5120',
-        ]);
-        
         $file = $request->file('image_file');
         $fileExtensionType = $file->getClientOriginalExtension();
         $fileSize = $file->getSize();
