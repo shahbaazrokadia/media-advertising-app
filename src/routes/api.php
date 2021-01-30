@@ -19,18 +19,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::namespace('Provider')->group(function () {
-    Route::resource('provider', 'ProviderController');
+    Route::apiResource('provider', 'ProviderController')->only(['index']);
 });
 
 Route::namespace('Image')->prefix('image')->group(function () {
-    Route::resource('upload', 'UploadController')->only(['store']);
+    Route::apiResource('upload', 'UploadController')->only(['store']);
 });
 
 Route::namespace('Video')->prefix('video')->group(function () {
-    Route::resource('upload', 'UploadController');
+    Route::apiResource('upload', 'VideoUploadController')->only(['store']);
 });
 
 
 Route::namespace('Media')->group(function () {
-    Route::resource('media', 'MediaController');
+    Route::apiResource('media', 'MediaController')->only(['index']);
 });
